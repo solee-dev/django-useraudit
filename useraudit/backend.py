@@ -11,6 +11,7 @@ from .models import LoginLogger, LoginAttempt
 from .models import LoginAttemptLogger
 from .middleware import get_request
 
+from django.contrib import messages #import messages
 
 logger = logging.getLogger("django.security")
 
@@ -46,6 +47,7 @@ class AuthFailedLoggerBackend(object):
         self.username = credentials.get(UserModel.USERNAME_FIELD)
         self.login_logger.log_failed_login(self.username, request)
         if self._get_user() is not None:
+            messages.error(request, "Your account is inactive.")
             self.login_attempt_logger.increment(self.username)
             self.block_user_if_needed()
 
