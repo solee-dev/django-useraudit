@@ -102,7 +102,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 import logging
 from .backend import AuthFailedLoggerBackend
-from .signals import password_has_expired, password_will_expire_warning, account_has_expired
+from .signals import password_has_expired, password_will_expire_warning, account_has_expired, account_made_inactive 
 
 logger = logging.getLogger("django.security")
 
@@ -242,6 +242,8 @@ class AccountExpiryBackend(object):
             # model supports it). Django only checks is_active at the
             # login view level.
             if hasattr(user, "is_active") and not user.is_active:
+                account_made_inactive.send(sender=user.__class__, user=user)
+                print ("Account is not active")
                 self._prevent_login(username, "Account is not active")
 
             if is_password_expired(user):
